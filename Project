@@ -60,7 +60,7 @@ f- set up the deployment job in jenkins
 
 ***************************************************************************** K8S_Clusters *****************************************************************
 
-d- set up k8s cluster on AWS using "kops"
+- set up k8s cluster on AWS using "kops"
               -> create an EC2 instance and install AWSCLI, kubectl, kops
               -> create an IAM user/role with route53, EC2, IAM and S3 full access
               -> attach IAM role to EC2 instance
@@ -68,10 +68,12 @@ d- set up k8s cluster on AWS using "kops"
               -> create an S3 bucket and Expose environment variable
               -> create SSH keys before creating cluster
               -> create k8s cluster and validate your cluster (1 master and 2 nodes created)
--> vim deploy.yml (give name_app, pods_number, artifact created with no tag for pulling each time the latest)
--> vim service.yml (give name_service, name_app) => put a LB in front of the pods. ( go to the browser; IP_master:31200/name.war )
-
- e- configure ansible to access k8s server for deployment  
+- Set up the password root 
+              -> vim /etc/ssh/sshd_config (PasswordAuthentication yes) -> if AWS
+- Create and Configure the deployment file and the service file              
+                    -> vim deploy.yml (give name_app, pods_number, artifact created with no tag for pulling each time the latest)
+                    -> vim service.yml (give name_service, name_app) => put a LB in front of the pods. ( go to the browser; IP_master:31200/name.war )
+ 
  
  **************************************************************************************** Jenkins_Job ***************************************************         
             
@@ -82,8 +84,8 @@ d- set up k8s cluster on AWS using "kops"
             -> warning next generation (junit, Sonarqube)
             -> SSH 
             
-- In global tool configuration; set up Git path, maven Path and Java path 
-
+- In global tool configuration; set up path of: git, maven and java 
+  
 - Configure jenkins to login to ansible using SSH and run playbook (part2)                                         
         -> in manage credentials -> kind: username (user1) with password => jenkins uses the user1 credential to login to ansible
         -> configure system -> SSH sites
