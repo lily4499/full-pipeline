@@ -3,13 +3,34 @@ the task here was to automate the deployment process of an app.
 At the end, we had to be able to push the code from git locally and watch the change goes all the way to the deployemt without any manual effort.
 
 TO Do:
-a- Set up a new repositry in github to put the code from the developer server and make changes to the repo and push it back to github
-d- set up k8s cluster
-b- install and configure ansible server
-c- set up jenkins job to integrate git, maven, docker, Junit; then configure jenkins to login to ansible using SSH and run playbook
-d- set up k8s cluster
-e- configure ansible to access k8s server for deployment
-f- set up the deployment job in jenkins
+On Github
+- Set up a new repositry in github
+
+On Gitbash 
+- Create in our system the same repository that we create in remote repository; then initialize and 
+  put the code from the developer server and make changes to the repo and push it back to github
+  
+On Jenkins Server 
+- Install jenkins; Maven; Git ; Docker and set up Java path, Maven path.    
+
+On Ansible Server
+- Install ansible         
+- Configure jenkins to login to ansible using SSH and run playbook (part1= create a user and passwd)     
+- configure  ansible server to access k8s server for deployment                
+- set up Ansible_deployment_file for playbook
+        
+On Kubernetes Clusters
+- set up k8s cluster on AWS using "kops"
+- Set up the password root            
+- Create and Configure the deployment file for artifact, pods and the service file  for loadbalancer            
+
+On Jenkins Job                   
+- Set up jenkins to integrate git, maven, docker, Junit; 
+- Configure jenkins to login to ansible using SSH and run playbook (part2= in manage credentials and configure system))                                                 
+- Set up 2 jobs: build_code which triggers deploy_code
+
+
+
 
 ************************************************************ SETUP ***********************************************************************
 
@@ -38,14 +59,11 @@ f- set up the deployment job in jenkins
                             
 **********************************************************Jenkins_Server*********************************************************************                           
 
-- set up jenkins server and jenkins console to integrate git, maven, docker, Junit; 
-            -> install jenkins; maven; git ; docker
-            -> set up Java path, maven path,
+- Install jenkins; Maven; Git ; Docker and set up Java path, Maven path.
             
 
 ******************************************************************* Ansible_server *******************************************************************
-- install and configure ansible server
-          -> yum install ansible
+- Install ansible
           -> cd /etc/ansible
 - Configure jenkins to login to ansible using SSH and run playbook (part1)
           -> useradd user1 and passwd user1
@@ -53,9 +71,9 @@ f- set up the deployment job in jenkins
           -> service sshd restart
           -> su user1
           -> ansible -i /etc/ansible/hosts k8S -m ping
-- configure  ansible server to access k8s server for deployment         
+- Configure  ansible server to access k8s server for deployment         
           -> vim hosts ([k8s] ansible_host="IP_k8s" ansible_ssh_user=root ansible_ssh_pass=*******)
-- set up deplyment file
+- Set up Ansible_deployment_file for playbook
           -> vim k8s.yml ( command: kubectl create -f deploy.yml; kubectl create-f service.yml )
 
 ***************************************************************************** K8S_Clusters *****************************************************************
@@ -69,22 +87,23 @@ f- set up the deployment job in jenkins
               -> create SSH keys before creating cluster
               -> create k8s cluster and validate your cluster (1 master and 2 nodes created)
 - Set up the password root 
+              -> passwd root
               -> vim /etc/ssh/sshd_config (PasswordAuthentication yes | PermitRootLogin yes) -> if AWS
-- Create and Configure the deployment file and the service file              
+- Create and Configure the deployment file for artifact, pods and the service file  for loadbalancer              
                     -> vim deploy.yml (give name_app, pods_number, artifact created with no tag for pulling each time the latest)
                     -> vim service.yml (give name_service, name_app) => put a LB in front of the pods. ( go to the browser; IP_master:31200/name.war )
  
  
  **************************************************************************************** Jenkins_Job ***************************************************         
-            
-- In manage plugins; install plugins 
-            -> Git 
-            -> maven invoker and maven integration
-            -> CloudBees Docker Build and Publish
-            -> warning next generation (junit, Sonarqube)
-            -> SSH 
-            
-- In global tool configuration; set up path of: git, maven and java 
+- Set up jenkins to integrate git, maven, docker, Junit;            
+            * In manage plugins; install plugins 
+                        -> Git 
+                        -> maven invoker and maven integration
+                        -> CloudBees Docker Build and Publish
+                        -> warning next generation (junit, Sonarqube)
+                        -> SSH 
+
+            * In global tool configuration; set up path of: git, maven and java 
   
 - Configure jenkins to login to ansible using SSH and run playbook (part2)                                         
         -> in manage credentials -> kind: username (user1) with password => jenkins uses the user1 credential to login to ansible
