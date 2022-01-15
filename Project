@@ -42,7 +42,7 @@ c- set up jenkins server and jenkins console to integrate git, maven, docker, Ju
             -> install jenkins; maven; git ; docker
             -> set up Java path, maven path,
             
-**********************************************************Jenkins_Job********************************************************************            
+********************************************************** Jenkins_Job ********************************************************************            
             
     - in manage plugins; install plugins 
             -> Git 
@@ -64,19 +64,18 @@ e-  set up 2 jobs: build_code which triggers deploy_code
                                               -> Build (Execute script on remote host using ssh; command: ansible-playbook /etc/ansible/k8s.yml)
 
 
-*******************************************************************Ansible_server*******************************************************************
+******************************************************************* Ansible_server *******************************************************************
 b- install and configure ansible server
--> yum install ansible
-
-e- configure  ansible server to access k8s server for deployment
--> Install ansible -> cd /etc/ansible
+          -> yum install ansible
+          -> cd /etc/ansible
 d- Configure jenkins to login to ansible using SSH and run playbook (part1)
--> useradd user1 and passwd user1
--> vim /etc/ssh/sshd_config (PasswordAuthentication yes) -> if AWS
--> service sshd restart
--> su user1
--> ansible -i /etc/ansible/hosts k8S -m ping
-
+          -> useradd user1 and passwd user1
+          -> vim /etc/ssh/sshd_config (PasswordAuthentication yes) -> if AWS
+          -> service sshd restart
+          -> su user1
+          -> ansible -i /etc/ansible/hosts k8S -m ping
+e- configure  ansible server to access k8s server for deployment
+          
 
 -> vim hosts ([k8s] ansible_host="IP_k8s" ansible_ssh_user=root ansible_ssh_pass=*******)
 
