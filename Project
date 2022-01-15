@@ -16,8 +16,8 @@ On Jenkins Server
 On Ansible Server
 - Install ansible         
 - Configure jenkins to login to ansible using SSH and run playbook (part1= create a user and passwd)     
-- configure  ansible server to access k8s server for deployment                
-- set up Ansible_deployment_file for playbook
+- configure  ansible server to access k8s server for deployment (using Ansible_hosts with IP and root credentials)              
+- set up Ansible_deployment_file for playbook (with kubectl command in there).
         
 On Kubernetes Clusters
 - set up k8s cluster on AWS using "kops"
