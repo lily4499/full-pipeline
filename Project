@@ -4,16 +4,23 @@ At the end, we had to be able to push the code from git locally and watch the ch
 
 TO Do:
 a- Set up a new repositry in github to put the code from the developer server and make changes to the repo and push it back to github
+d- set up k8s cluster
 b- install and configure ansible server
 c- set up jenkins job to integrate git, maven, docker, Junit; then configure jenkins to login to ansible using SSH and run playbook
 d- set up k8s cluster
-e- configure ansible to access k8s master server for deployment
+e- configure ansible to access k8s server for deployment
 f- set up the deployment job in jenkins
 
+************************************************************ SETUP ***********************************************************************
 
-a- Set up a new repositry in github to put the code from the developer server and make changes to the repo and push it back to github
-  - in Github -> new repo -> repo1
-  - In Gitbash -> mkdir repo1 -> cd repo1
+************************************************************ Github ***********************************************************************
+a- Set up a new repositry in github
+  -> new repo -> repo1
+  
+*********************************************************** Gitbash *********************************************************************** 
+ Create in our system the same repository that we create in remote repository; then initialize and 
+ put the code from the developer server and make changes to the repo and push it back to github
+                            -> mkdir repo1 -> cd repo1
                             -> echo "# repo1" >> README.md  
                             -> git init
                             -> git add.
@@ -21,41 +28,75 @@ a- Set up a new repositry in github to put the code from the developer server an
                             -> git remote -v
                             -> git commit -m "readme"
                             -> scp -r Dev_username@Dev_hostname(IP):Dev_file .
-                            -> ls ( Dockerfile   pom.xml   README.md   server/   webapp/          )
+                            -> ls ( Dockerfile   pom.xml   README.md   server/   webapp/   )
                             -> vim webapp/pom.xml (to modify artifact name)
                             -> vim webapp/src/main/webapp/index.jsp  ( to modify content)
                             -> vim Dockerfile ( to modify war file name in webapp/target/name.war)
                             -> git add.
                             -> git commit -m "code"
                             -> git push origin main
-    
+                            
+**********************************************************Jenkins_Server*********************************************************************                           
+
+c- set up jenkins server and jenkins console to integrate git, maven, docker, Junit; 
+            -> install jenkins; maven; git ; docker
+            -> set up Java path, maven path,
+            
+**********************************************************Jenkins_Job********************************************************************            
+            
+    - in manage plugins; install plugins 
+            -> Git 
+            -> maven invoker and maven integration
+            -> CloudBees Docker Build and Publish
+            -> warning next generation (junit, Sonarqube)
+            -> SSH 
+                                                 
+   - In global tool configuration; set up Git path, maven Path and Java path 
+
+d- Configure jenkins to login to ansible using SSH and run playbook (part2)                                         
+        -> in manage credentials -> kind: username (user1) with password => jenkins uses the user1 credential to login to ansible
+        -> configure system -> SSH sites
+        
+e-  set up 2 jobs: build_code which triggers deploy_code
+        -> configure job_code: maven job -> pull code (git); build(maven) ; test(Junit) ; deploy to a registry (Docker Build and Publish)
+                                         
+        -> Configure job_deploy: freestyle job-> Build Triggers (build after job_code) 
+                                              -> Build (Execute script on remote host using ssh; command: ansible-playbook /etc/ansible/k8s.yml)
+
+
+*******************************************************************Ansible_server*******************************************************************
 b- install and configure ansible server
 -> yum install ansible
--> cd /etc/ansible
--> vim hosts ([k8s] ansible_host="IP_k8s" ansible_ssh_user=root ansible_ssh_pass=*******)
--> vim k8s.yml ( command: kubectl create -f deploy.yml; kubectl create-f service.yml )
+
+e- configure  ansible server to access k8s server for deployment
+-> Install ansible -> cd /etc/ansible
+d- Configure jenkins to login to ansible using SSH and run playbook (part1)
 -> useradd user1 and passwd user1
 -> vim /etc/ssh/sshd_config (PasswordAuthentication yes) -> if AWS
 -> service sshd restart
 -> su user1
 -> ansible -i /etc/ansible/hosts k8S -m ping
 
-c- set up jenkins job to integrate git, maven, docker, Junit; then configure jenkins to login to ansible using SSH and run playbook
-- in Jenkins server
-        -> install jenkins and set java path, maven and set maven path, docker, git
-- In Jenkins console
-        -> set Java path  in global tool configuration and install plugins: 
-                                             - Git and set path in global tool configuration
-                                             - maven invoker and maven integration and set path in global tool configuration 
-                                             - CloudBees Docker Build and Publish
-                                             - warning next generation (junit, Sonarqube)
-                                             - SSH
-        -> in manage credentials -> kind: username (user1) with password => jenkins uses the user1 credential to login to ansible
-        -> configure system -> SSH sites
-        -> configure job_code: maven job -> pull code (git); build(maven) ; test(Junit) ; deploy to a registry (Docker Build and Publish)
-        -> Configure job_deploy: freestyle job-> Build Triggers (build after job_code) 
-                                              -> Build (Execute script on remote host using ssh; command: ansible-playbook /etc/ansible/k8s.yml)
-                     
+
+-> vim hosts ([k8s] ansible_host="IP_k8s" ansible_ssh_user=root ansible_ssh_pass=*******)
+
+h- set up deplyment file
+-> vim k8s.yml ( command: kubectl create -f deploy.yml; kubectl create-f service.yml )
+
+
+
+d- set up k8s cluster on AWS using "kops"
+              -> create an EC2 instance and install AWSCLI, kubectl, kops
+              -> create an IAM user/role with route53, EC2, IAM and S3 full access
+              -> attach IAM role to EC2 instance
+              -> create a route53 private hosted zone
+              -> create an S3 bucket and Expose environment variable
+              -> create SSH keys before creating cluster
+              -> create k8s cluster and validate your cluster (1 master and 2 nodes created)
+-> vim deploy.yml (give name_app, pods_number, artifact created with no tag for pulling each time the latest)
+-> vim service.yml (give name_service, name_app) => put a LB in front of the pods. ( go to the browser; IP_master:31200/name.war )
+
+ e- configure ansible to access k8s server for deployment                    
                     
 
     
